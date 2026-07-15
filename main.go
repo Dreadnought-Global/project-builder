@@ -15,7 +15,55 @@ func main() {
 	fmt.Println("========================================")
 	fmt.Println()
 
-	rootDir := getTargetRootDir()
+	// Parse --reconfigure flag
+	reconfigure := false
+	for _, arg := range os.Args[1:] {
+		if arg == "--reconfigure" || arg == "-r" {
+			reconfigure = true
+			break
+		}
+	}
+
+	// Load configuration
+	cfg, err := LoadConfig()
+	if err != nil {
+		fmt.Printf("Error loading configuration: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Check if we need to run first-run setup TUI
+	if cfg.WorkbenchPath == "" || reconfigure {
+		if reconfigure {
+			fmt.Println("Reconfiguring root workbench path...")
+		} else {
+			fmt.Println("First-run setup: Root workbench path not configured.")
+		}
+		selectedPath, err := RunFolderBrowser()
+		if err != nil {
+			fmt.Printf("Error running folder browser: %v\n", err)
+			os.Exit(1)
+		}
+		if selectedPath == "" {
+			fmt.Println("No folder selected. Configuration aborted.")
+			os.Exit(0)
+		}
+		cfg.WorkbenchPath = selectedPath
+		if err := SaveConfig(cfg); err != nil {
+			fmt.Printf("Error saving configuration: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Saved root workbench path: %s\n\n", cfg.WorkbenchPath)
+	}
+
+	rootDir := cfg.WorkbenchPath
+
+	// Verify that rootDir exists and is a directory
+	if info, err := os.Stat(rootDir); err != nil || !info.IsDir() {
+		fmt.Printf("Error: The saved workbench path '%s' is not accessible or is not a folder.\n", rootDir)
+		fmt.Println("Please run project-builder with the '--reconfigure' flag to set a new workbench path.")
+		os.Exit(1)
+	}
+
 	reader := bufio.NewReader(os.Stdin)
 
 	var projectName string
@@ -173,7 +221,7 @@ func main() {
 
 	// 5. Generate Folder Structure
 	fmt.Printf("\nScaffolding folders in %s...\n", targetPath)
-	err := CreateFolderStructure(targetPath, disciplineChoice, isClient)
+	err = CreateFolderStructure(targetPath, disciplineChoice, isClient)
 	if err != nil {
 		fmt.Printf("Error during folder generation: %v\n", err)
 		os.Exit(1)

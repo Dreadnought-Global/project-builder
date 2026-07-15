@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func TestSanitizeProjectName(t *testing.T) {
@@ -93,5 +95,85 @@ func TestCreateFolderStructure(t *testing.T) {
 		} else if !info.IsDir() {
 			t.Errorf("expected path %s is not a directory", folder)
 		}
+	}
+}
+
+func TestConfigLoadSave(t *testing.T) {
+	tempDir := t.TempDir()
+	tempConfigPath := filepath.Join(tempDir, "config.yaml")
+
+	// Set override
+	configFilePathOverride = tempConfigPath
+	defer func() { configFilePathOverride = "" }()
+
+	// Test loading when file does not exist
+	cfg, err := LoadConfig()
+	if err != nil {
+		t.Fatalf("LoadConfig failed when file does not exist: %v", err)
+	}
+	if cfg.WorkbenchPath != "" {
+		t.Errorf("expected empty WorkbenchPath, got %q", cfg.WorkbenchPath)
+	}
+
+	// Test saving
+	expectedPath := "/some/mock/workbench/path"
+	cfg.WorkbenchPath = expectedPath
+	err = SaveConfig(cfg)
+	if err != nil {
+		t.Fatalf("SaveConfig failed: %v", err)
+	}
+
+	// Test loading saved config
+	loadedCfg, err := LoadConfig()
+	if err != nil {
+		t.Fatalf("LoadConfig failed: %v", err)
+	}
+	if loadedCfg.WorkbenchPath != expectedPath {
+		t.Errorf("expected WorkbenchPath %q, got %q", expectedPath, loadedCfg.WorkbenchPath)
+	}
+}
+
+func TestTUIFolderBrowser(t *testing.T) {
+	tempDir := t.TempDir()
+	subDir1 := filepath.Join(tempDir, "FolderA")
+	subDir2 := filepath.Join(tempDir, "FolderB")
+	_ = os.Mkdir(subDir1, 0755)
+	_ = os.Mkdir(subDir2, 0755)
+
+	m := folderBrowserModel{
+		currentDir: tempDir,
+	}
+	err := m.updateFolders()
+	if err != nil {
+		t.Fatalf("failed to update folders: %v", err)
+	}
+
+	// Verify both subfolders are loaded
+	if len(m.folders) < 2 {
+		t.Fatalf("expected at least 2 folders, got %v", m.folders)
+	}
+
+	// Find index of FolderA and FolderB
+	idxA, idxB := -1, -1
+	for idx, f := range m.folders {
+		if f == "FolderA" {
+			idxA = idx
+		} else if f == "FolderB" {
+			idxB = idx
+		}
+	}
+	if idxA == -1 || idxB == -1 {
+		t.Fatalf("folders not found in TUI: %v", m.folders)
+	}
+
+	// Test moving cursor to FolderA
+	m.cursor = idxA
+
+	// Press Space/s to select
+	newModel, _ := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'s'}})
+	m = newModel.(folderBrowserModel)
+
+	if m.selected != subDir1 {
+		t.Errorf("expected selected path to be %q, got %q", subDir1, m.selected)
 	}
 }
