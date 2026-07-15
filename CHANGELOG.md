@@ -5,6 +5,11 @@ All notable changes to Project Builder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as detailed in [AGENTS.md](AGENTS.md).
 
+## [1.1.2] - 2026-07-15
+
+### Fixed
+- Fixed folder opening behavior where the terminal window closed prematurely on option 1. The terminal now waits for the user to press Enter before exiting.
+
 ## [1.1.1] - 2026-07-15
 
 ### Fixed

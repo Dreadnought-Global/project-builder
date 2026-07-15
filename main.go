@@ -247,6 +247,8 @@ func main() {
 				if err := OpenFolder(targetPath); err != nil {
 					fmt.Printf("Failed to open folder: %v\n", err)
 				}
+				fmt.Println("\nPress Enter to exit...")
+				_, _ = reader.ReadString('\n')
 			}
 			break
 		}
