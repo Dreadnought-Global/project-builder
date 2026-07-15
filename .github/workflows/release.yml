@@ -21,6 +21,25 @@ jobs:
         with:
           go-version: '1.26'
 
+      - name: Extract Release Notes from CHANGELOG
+        run: |
+          # Strip the leading 'v' from the tag name (e.g. v1.1.3 -> 1.1.3)
+          VERSION="${GITHUB_REF_NAME#v}"
+
+          # Extract the section between the matching ## [VERSION] heading and the next ## heading.
+          # awk: start printing after the matching header line, stop before the next one.
+          NOTES=$(awk "/^## \[${VERSION}\]/{found=1; next} found && /^## \[/{exit} found{print}" CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            echo "ERROR: No entry found in CHANGELOG.md for version [${VERSION}]."
+            echo "Update CHANGELOG.md with a section matching '## [${VERSION}]' before tagging a release."
+            exit 1
+          fi
+
+          echo "$NOTES" > release_notes.md
+          echo "--- Release notes to be published ---"
+          cat release_notes.md
+
       - name: Build Binaries
         run: |
           mkdir -p dist
@@ -38,6 +57,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: release_notes.md
           files: |
             dist/*
         env:

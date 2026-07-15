@@ -28,6 +28,13 @@ Versions must follow the standard `MAJOR.MINOR.PATCH` format. Version bumps are 
 A `CHANGELOG.md` file must be maintained at the repository root and updated concurrently with every version bump.
 - Each entry must specify the version number, release date, and a clear, plain-language description of what changed and why.
 - Do not dump raw commit messages. Entries must be reader-friendly and summarize user-facing impact.
+- **`CHANGELOG.md` must be updated and committed before tagging a release.** The release workflow enforces this: if no matching `## [X.Y.Z]` section exists for the tagged version, the workflow will fail loudly with an error rather than produce a release with an empty or raw-commit-message body.
+
+## GitHub Release Notes
+
+Every tagged release must have its GitHub Release notes automatically populated from the matching version entry in `CHANGELOG.md` via the release workflow. The workflow extracts the section corresponding to the pushed tag and uses it as the release body.
+
+A release must never ship with an empty, missing, or raw-commit-message release body. If the `CHANGELOG.md` entry for the version does not exist at tag time, the workflow fails immediately — this is by design and is the enforcement mechanism for the changelog rule above.
 
 ## Local Development Build Workflow
 
