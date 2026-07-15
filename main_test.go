@@ -156,9 +156,10 @@ func TestTUIFolderBrowser(t *testing.T) {
 	// Find index of FolderA and FolderB
 	idxA, idxB := -1, -1
 	for idx, f := range m.folders {
-		if f == "FolderA" {
+		switch f {
+		case "FolderA":
 			idxA = idx
-		} else if f == "FolderB" {
+		case "FolderB":
 			idxB = idx
 		}
 	}

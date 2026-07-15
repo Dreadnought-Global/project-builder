@@ -256,33 +256,6 @@ func main() {
 	fmt.Println("Exiting Project Builder. Goodbye!")
 }
 
-// getTargetRootDir retrieves the directory of the running executable.
-// If it's running via `go run`, it falls back to the current working directory.
-func getTargetRootDir() string {
-	exePath, err := os.Executable()
-	if err != nil {
-		return "."
-	}
-	evalPath, err := filepath.EvalSymlinks(exePath)
-	if err != nil {
-		evalPath = exePath
-	}
-	dir := filepath.Dir(evalPath)
-	if isTempDir(dir) {
-		return "."
-	}
-	return dir
-}
-
-// isTempDir checks if the directory is located in the system temporary directory.
-func isTempDir(dir string) bool {
-	tempDir := os.TempDir()
-	rel, err := filepath.Rel(tempDir, dir)
-	if err != nil {
-		return false
-	}
-	return len(rel) > 0 && rel[0] != '.' && rel != ".."
-}
 
 // sanitizeProjectName cleans up a user's input name to be safe across filesystems.
 func sanitizeProjectName(name string) string {
