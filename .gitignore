@@ -1,0 +1,11 @@
+# Binaries
+project-builder
+project-builder-linux-amd64
+project-builder-windows-amd64.exe
+project-builder-darwin-amd64
+project-builder-darwin-arm64
+dist/
+
+# Test directories
+Manual_Test_Project*/
+test_project/
