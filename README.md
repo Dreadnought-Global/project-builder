@@ -21,6 +21,18 @@ Pre-built binaries for Windows, macOS, and Linux are available on the GitHub Rel
 1. Download the executable appropriate for your operating system.
 2. Place the binary in your system path or execute it directly.
 
+### Linux Installation & Desktop Launcher
+
+Running the binary directly from a terminal (`./project-builder`) is the standard, fully-supported way to run the tool on Linux.
+
+For double-click launching via a file manager, a `project-builder.desktop` file is provided in the release. To install:
+1. Copy `project-builder.desktop` to `~/.local/share/applications/`.
+2. Edit the `Exec` line in the copied file to point to the absolute path of your compiled binary (e.g. `Exec=/home/user/bin/project-builder`).
+3. Make the `.desktop` file executable:
+   ```bash
+   chmod +x ~/.local/share/applications/project-builder.desktop
+   ```
+
 ### Configuration Path
 
 The tool stores its configuration file at the following locations:

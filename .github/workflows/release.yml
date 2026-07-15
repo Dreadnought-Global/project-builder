@@ -32,6 +32,8 @@ jobs:
           GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o dist/project-builder-darwin-amd64 .
           # Build for macOS (arm64)
           GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/project-builder-darwin-arm64 .
+          # Copy desktop file for Linux release
+          cp project-builder.desktop dist/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2

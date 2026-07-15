@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Project Builder
+Comment=Scaffold standardized project folder structures for creative work
+Exec=project-builder
+Icon=utilities-terminal
+Terminal=true
+Categories=Development;Utility;

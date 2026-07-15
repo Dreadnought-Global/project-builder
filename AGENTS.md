@@ -28,3 +28,16 @@ Versions must follow the standard `MAJOR.MINOR.PATCH` format. Version bumps are 
 A `CHANGELOG.md` file must be maintained at the repository root and updated concurrently with every version bump.
 - Each entry must specify the version number, release date, and a clear, plain-language description of what changed and why.
 - Do not dump raw commit messages. Entries must be reader-friendly and summarize user-facing impact.
+
+## Local Development Build Workflow
+
+Once any task, fix, or feature is completed and verified via automated tests, always run the following command to produce an immediately runnable local binary:
+
+```bash
+go build -o project-builder && ./project-builder
+```
+
+This compiles the current source into a binary named `project-builder` (overwriting any previous local build) and immediately runs it. This ensures that the binary is left in an immediately testable/runnable state for direct manual validation.
+
+The release pipeline (version tagging, cross-platform builds, GitHub Releases) is reserved for actual versioned releases meant for distribution. Do not tag/release for local iteration or testing.
+
