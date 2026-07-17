@@ -30,6 +30,29 @@ func (d Discipline) String() string {
 	}
 }
 
+func (d Discipline) DisciplineKey() string {
+	switch d {
+	case Design:
+		return "design"
+	case VideoMotion:
+		return "video_motion"
+	case Audio:
+		return "audio"
+	case Animation3D:
+		return "3d_animation"
+	default:
+		return "unknown"
+	}
+}
+
+// ProjectCategorySubfolder returns the correct subfolder based on the client flag.
+func ProjectCategorySubfolder(isClient bool) string {
+	if isClient {
+		return "00_Client_Projects"
+	}
+	return "01_Passion_Projects"
+}
+
 // GetFolderList returns the relative folder structure paths for a discipline and client overlay.
 func GetFolderList(d Discipline, isClient bool) ([]string, error) {
 	var folders []string

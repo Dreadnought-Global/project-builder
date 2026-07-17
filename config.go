@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -14,7 +15,33 @@ var configFilePathOverride string
 
 // Config represents the application settings structure.
 type Config struct {
-	WorkbenchPath string `yaml:"workbench_path"`
+	DefaultWorkbench string            `yaml:"default_workbench"`
+	DisciplinePaths  map[string]string `yaml:"discipline_paths"`
+}
+
+func (c *Config) GetDisciplinePath(d Discipline) string {
+	if c.DisciplinePaths == nil {
+		return ""
+	}
+	val := strings.TrimSpace(c.DisciplinePaths[d.DisciplineKey()])
+	if val == declinedDisciplinePath {
+		return ""
+	}
+	return val
+}
+
+func (c *Config) HasDeclinedDefault(d Discipline) bool {
+	if c.DisciplinePaths == nil {
+		return false
+	}
+	return strings.TrimSpace(c.DisciplinePaths[d.DisciplineKey()]) == declinedDisciplinePath
+}
+
+func (c *Config) SetDisciplinePath(d Discipline, path string) {
+	if c.DisciplinePaths == nil {
+		c.DisciplinePaths = make(map[string]string)
+	}
+	c.DisciplinePaths[d.DisciplineKey()] = strings.TrimSpace(path)
 }
 
 // GetConfigFilePath returns the resolved OS-specific path for config.yaml.
@@ -64,8 +91,26 @@ func LoadConfig() (Config, error) {
 		return cfg, fmt.Errorf("failed to read config file: %w", err)
 	}
 
+	// Try migration first
+	var raw map[string]interface{}
+	if err := yaml.Unmarshal(data, &raw); err == nil {
+		if wp, ok := raw["workbench_path"].(string); ok && strings.TrimSpace(wp) != "" {
+			cfg.DefaultWorkbench = strings.TrimSpace(wp)
+			cfg.DisciplinePaths = make(map[string]string)
+			_ = SaveConfig(cfg) // Auto-save migrated config
+			return cfg, nil
+		}
+	}
+
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return cfg, fmt.Errorf("failed to parse yaml: %w", err)
+	}
+	cfg.DefaultWorkbench = strings.TrimSpace(cfg.DefaultWorkbench)
+	if cfg.DisciplinePaths == nil {
+		cfg.DisciplinePaths = make(map[string]string)
+	}
+	for key, value := range cfg.DisciplinePaths {
+		cfg.DisciplinePaths[key] = strings.TrimSpace(value)
 	}
 
 	return cfg, nil

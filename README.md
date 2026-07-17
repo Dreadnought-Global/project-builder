@@ -10,9 +10,9 @@ The tool automates the creation of directory trees for four creative disciplines
 - Audio
 - 3D & Animation
 
-It provides a conditional client project overlay (`00_Client_Docs` at the root and `Client_Handoff` within the discipline's final export folders).
+It provides a conditional client project overlay (`00_Client_Docs` at the root and `Client_Handoff` within the discipline's final export folders). Client projects are nested under a `00_Client_Projects` directory, while non-client projects are placed under `01_Passion_Projects`.
 
-Upon the first run, the tool launches an interactive, terminal-based folder browser to select a root workbench directory. This path is stored in a configuration file (`config.yaml`) and used for all subsequent project initializations.
+Upon the first run, the tool launches an interactive, terminal-based folder browser to select a Global Default Workbench directory. During project creation, users can choose to save different default destinations on a per-discipline basis using an OS-native folder picker dialog or the terminal browser. These paths are stored in a configuration file (`config.yaml`) and used for subsequent project initializations.
 
 ## Installation
 
@@ -49,7 +49,7 @@ Run the compiled executable to start the interactive initialization flow:
 
 ### Command Line Flags
 
-To reset and reconfigure the root workbench path, pass the reconfigure flag:
+To reset and reconfigure the global default workbench path, pass the reconfigure flag:
 
 ```bash
 ./project-builder --reconfigure

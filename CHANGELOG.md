@@ -5,8 +5,22 @@ All notable changes to Project Builder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as detailed in [AGENTS.md](AGENTS.md).
 
-## [1.1.3] - 2026-07-15
+## [2.0.0] - 2026-07-15
 
+### Added
+- Native OS folder picker dialogs for discipline destination selection (Windows FolderBrowserDialog, macOS `osascript`, Linux `zenity`/`kdialog` with terminal TUI fallback).
+- Per-discipline destination selection flow with options to use the Global Default Workbench, Native OS Picker, or Terminal Browser.
+- Option to save or decline a default workbench path on a per-discipline basis.
+
+### Changed
+- **BREAKING:** Changed configuration schema in `config.yaml` from a single `workbench_path` to a `default_workbench` and `discipline_paths` map. Old configs are automatically migrated on next run.
+- Redesigned the CLI prompt flow to request project name and discipline before asking for the destination and client flags.
+
+### Fixed
+- Fixed bug where the "Client Project" flag did not correctly resolve the root target folder to `00_Client_Projects` vs `01_Passion_Projects`.
+- Added automated tests to ensure client flag structures and folder resolution logic operate correctly.
+
+## [1.1.3] - 2026-07-15
 ### Fixed
 - Updated release workflow to automatically populate GitHub Release notes from the matching `CHANGELOG.md` entry for the tagged version.
 - Workflow now fails loudly if no matching `CHANGELOG.md` entry is found for the pushed tag, enforcing the changelog-before-tagging rule.
