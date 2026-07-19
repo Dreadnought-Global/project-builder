@@ -17,6 +17,14 @@ type RenderOptions struct {
 	Width    int
 }
 
+var activeRenderOptions = RenderOptions{UseColor: false, Width: 140}
+var activeTheme, _ = GetTheme(defaultThemeName)
+
+func SetActiveStyle(theme Theme, opts RenderOptions) {
+	activeTheme = theme
+	activeRenderOptions = opts
+}
+
 func DetectRenderOptions(noColor bool) RenderOptions {
 	useColor := !noColor && os.Getenv("NO_COLOR") == "" && os.Getenv("PROJECT_BUILDER_NO_COLOR") == ""
 	width := 140
@@ -39,12 +47,33 @@ func hyperlink(label, url string) string {
 	return fmt.Sprintf("\x1b]8;;%s\x07%s\x1b]8;;\x07", url, label)
 }
 
+func primaryText(text string) string { return colorize(text, activeTheme.Primary, activeRenderOptions) }
+func accentText(text string) string  { return colorize(text, activeTheme.Accent, activeRenderOptions) }
+func mutedText(text string) string   { return colorize(text, activeTheme.Muted, activeRenderOptions) }
+func successText(text string) string { return colorize(text, activeTheme.Success, activeRenderOptions) }
+func warningText(text string) string { return colorize(text, activeTheme.Warning, activeRenderOptions) }
+func errorText(text string) string   { return colorize(text, activeTheme.Error, activeRenderOptions) }
+func promptText(text string) string {
+	return colorize(text, activeTheme.SelectionIndicator, activeRenderOptions)
+}
+
 func stripANSI(s string) string {
 	return ansiRegexp.ReplaceAllString(s, "")
 }
 
 func visibleLen(s string) int {
 	return utf8.RuneCountInString(stripANSI(s))
+}
+
+func gradientLine(text string, stops []RGB, row, rows int, opts RenderOptions) string {
+	if !opts.UseColor || len(stops) == 0 {
+		return text
+	}
+	ratio := 0.0
+	if rows > 1 {
+		ratio = float64(row) / float64(rows-1)
+	}
+	return colorize(text, interpolateStops(stops, ratio), opts)
 }
 
 func gradientText(text string, stops []RGB, opts RenderOptions) string {

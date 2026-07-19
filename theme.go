@@ -30,7 +30,7 @@ type Theme struct {
 var themes = map[string]Theme{
 	"violet": {
 		Name:                "violet",
-		BannerGradientStops: []RGB{{91, 39, 160}, {191, 64, 255}, {255, 185, 245}},
+		BannerGradientStops: []RGB{{200, 140, 255}, {180, 100, 255}, {160, 70, 255}, {140, 50, 230}, {120, 30, 210}, {100, 20, 190}},
 		Primary:             RGB{245, 230, 255}, Accent: RGB{205, 90, 255}, Muted: RGB{168, 145, 184},
 		Success: RGB{86, 230, 166}, Warning: RGB{255, 199, 95}, Error: RGB{255, 106, 132},
 		SelectionIndicator: RGB{218, 96, 255}, Shadow: RGB{58, 20, 86},

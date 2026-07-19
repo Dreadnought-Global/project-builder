@@ -22,14 +22,16 @@ func main() {
 	}
 
 	renderOpts := DetectRenderOptions(opts.NoColor)
-	fmt.Print(RenderStartupBanner(ActiveTheme(cfg), CurrentReleaseMetadata(), renderOpts))
+	theme := ActiveTheme(cfg)
+	SetActiveStyle(theme, renderOpts)
+	fmt.Print(RenderStartupBanner(theme, CurrentReleaseMetadata(), renderOpts))
 
 	// 1. Global Default Workbench setup
 	if cfg.DefaultWorkbench == "" || opts.Reconfigure {
 		if opts.Reconfigure {
-			fmt.Println("Reconfiguring global default workbench path...")
+			fmt.Println(accentText("Reconfiguring global default workbench path..."))
 		} else {
-			fmt.Println("First-run setup: Global default workbench path not configured.")
+			fmt.Println(accentText("First-run setup: Global default workbench path not configured."))
 		}
 		selectedPath, err := RunFolderBrowser()
 		if err != nil {
@@ -45,7 +47,7 @@ func main() {
 			fmt.Printf("Error saving configuration: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("Saved global default workbench path: %s\n\n", cfg.DefaultWorkbench)
+		fmt.Printf("%s %s\n\n", successText("Saved global default workbench path:"), cfg.DefaultWorkbench)
 	}
 
 	reader := bufio.NewReader(os.Stdin)
@@ -54,7 +56,7 @@ func main() {
 	var projectName string
 	var sanitizedName string
 	for {
-		fmt.Print("Project name: ")
+		fmt.Print(promptText("Project name:") + " ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Printf("Error reading input: %v\n", err)
@@ -74,16 +76,15 @@ func main() {
 		break
 	}
 
-	// 3. Select Discipline
-	fmt.Println("\nSelect discipline:")
-	fmt.Println("[1] Design")
-	fmt.Println("[2] Video & Motion")
-	fmt.Println("[3] Audio")
-	fmt.Println("[4] 3D & Animation")
+	fmt.Println(accentText("\nSelect discipline:"))
+	fmt.Println(promptText("[1]") + " " + primaryText("Design"))
+	fmt.Println(promptText("[2]") + " " + primaryText("Video & Motion"))
+	fmt.Println(promptText("[3]") + " " + primaryText("Audio"))
+	fmt.Println(promptText("[4]") + " " + primaryText("3D & Animation"))
 
 	var disciplineChoice Discipline
 	for {
-		fmt.Print("Selection (1-4): ")
+		fmt.Print(promptText("Selection") + mutedText(" (1-4): "))
 		choiceStr, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Printf("Error reading input: %v\n", err)
@@ -94,7 +95,7 @@ func main() {
 			disciplineChoice = Discipline(choice)
 			break
 		}
-		fmt.Println("Invalid selection. Please enter a number between 1 and 4.")
+		fmt.Println(errorText("Invalid selection. Please enter a number between 1 and 4."))
 	}
 
 	// 4. Per-Discipline Destination Selection Flow
@@ -106,10 +107,10 @@ func main() {
 		disciplineRoot = savedPath
 	} else {
 		// Show 3-option menu
-		fmt.Printf("\nWhere should this project be created?\n")
-		fmt.Printf("[1] Use Default Workbench (%s)\n", cfg.DefaultWorkbench)
-		fmt.Println("[2] Select folder (native picker)")
-		fmt.Println("[3] Select folder (terminal browser)")
+		fmt.Printf("\n%s\n", accentText("Where should this project be created?"))
+		fmt.Println(promptText("[1]") + " " + primaryText("Use Default Workbench") + mutedText(" ("+cfg.DefaultWorkbench+")"))
+		fmt.Println(promptText("[2]") + " " + primaryText("Select folder") + mutedText(" (native picker)"))
+		fmt.Println(promptText("[3]") + " " + primaryText("Select folder") + mutedText(" (terminal browser)"))
 
 		var folderChoice int
 		for {
@@ -124,13 +125,13 @@ func main() {
 				folderChoice = choice
 				break
 			}
-			fmt.Println("Invalid selection. Please enter 1, 2, or 3.")
+			fmt.Println(errorText("Invalid selection. Please enter 1, 2, or 3."))
 		}
 
 		if folderChoice == 1 {
 			disciplineRoot = cfg.DefaultWorkbench
 		} else if folderChoice == 2 {
-			fmt.Println("Opening native folder picker...")
+			fmt.Println(accentText("Opening native folder picker..."))
 			path, err := RunNativeFolderPicker()
 			if err != nil {
 				fmt.Printf("No GUI folder picker found (%v) — using terminal browser instead.\n", err)
@@ -141,7 +142,7 @@ func main() {
 				}
 			}
 			if path == "" {
-				fmt.Println("No folder selected. Aborting.")
+				fmt.Println(warningText("No folder selected. Aborting."))
 				os.Exit(0)
 			}
 			disciplineRoot = path
@@ -152,7 +153,7 @@ func main() {
 				os.Exit(1)
 			}
 			if path == "" {
-				fmt.Println("No folder selected. Aborting.")
+				fmt.Println(warningText("No folder selected. Aborting."))
 				os.Exit(0)
 			}
 			disciplineRoot = path
@@ -161,7 +162,7 @@ func main() {
 		// Ask to set as default ONLY if not previously declined
 		if !declined {
 			for {
-				fmt.Printf("\nSet this as the default workbench for %s? (y/n): ", disciplineChoice.String())
+				fmt.Printf("\n%s %s%s", promptText("Set this as the default workbench for"), primaryText(disciplineChoice.String()), mutedText("? (y/n): "))
 				input, err := reader.ReadString('\n')
 				if err != nil {
 					fmt.Printf("Error reading input: %v\n", err)
@@ -171,14 +172,14 @@ func main() {
 				if ok && isYes {
 					cfg.SetDisciplinePath(disciplineChoice, disciplineRoot)
 					_ = SaveConfig(cfg)
-					fmt.Println("Default saved.")
+					fmt.Println(successText("Default saved."))
 					break
 				} else if ok {
 					cfg.SetDisciplinePath(disciplineChoice, declinedDisciplinePath)
 					_ = SaveConfig(cfg)
 					break
 				}
-				fmt.Println("Invalid input. Please enter 'y' or 'n'.")
+				fmt.Println(errorText("Invalid input. Please enter 'y' or 'n'."))
 			}
 		}
 	}
@@ -192,7 +193,7 @@ func main() {
 	// 5. Client Project?
 	var isClient bool
 	for {
-		fmt.Print("\nClient project? (y/n): ")
+		fmt.Print("\n" + promptText("Client project?") + mutedText(" (y/n): "))
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Printf("Error reading input: %v\n", err)
@@ -203,7 +204,7 @@ func main() {
 			isClient = isYes
 			break
 		}
-		fmt.Println("Invalid input. Please enter 'y' or 'n'.")
+		fmt.Println(errorText("Invalid input. Please enter 'y' or 'n'."))
 	}
 
 	// 6. Target Path Resolution & Collision Check
@@ -212,14 +213,14 @@ func main() {
 		targetPath = ResolveTargetPath(disciplineRoot, isClient, sanitizedName)
 
 		if _, err := os.Stat(targetPath); err == nil {
-			fmt.Printf("\nWarning: A folder named '%s' already exists at:\n%s\n\n", sanitizedName, targetPath)
-			fmt.Println("[1] Rename project")
-			fmt.Println("[2] Append suffix (automatically append _01, _02, etc.)")
-			fmt.Println("[3] Abort")
+			fmt.Printf("\n%s %s\n%s\n\n", warningText("Warning: A folder named"), warningText("'"+sanitizedName+"' already exists at:"), targetPath)
+			fmt.Println(promptText("[1]") + " " + primaryText("Rename project"))
+			fmt.Println(promptText("[2]") + " " + primaryText("Append suffix") + mutedText(" (automatically append _01, _02, etc.)"))
+			fmt.Println(promptText("[3]") + " " + primaryText("Abort"))
 
 			var collisionChoice int
 			for {
-				fmt.Print("Selection (1-3): ")
+				fmt.Print(promptText("Selection") + mutedText(" (1-3): "))
 				choiceStr, err := reader.ReadString('\n')
 				if err != nil {
 					fmt.Printf("Error reading input: %v\n", err)
@@ -230,12 +231,12 @@ func main() {
 					collisionChoice = choice
 					break
 				}
-				fmt.Println("Invalid selection. Please enter 1, 2, or 3.")
+				fmt.Println(errorText("Invalid selection. Please enter 1, 2, or 3."))
 			}
 
 			if collisionChoice == 1 {
 				for {
-					fmt.Print("\nNew project name: ")
+					fmt.Print("\n" + promptText("New project name:") + " ")
 					input, err := reader.ReadString('\n')
 					if err != nil {
 						fmt.Printf("Error reading input: %v\n", err)
@@ -260,10 +261,10 @@ func main() {
 					return err == nil
 				}
 				sanitizedName, targetPath = NextAvailableProjectName(disciplineRoot, isClient, sanitizedName, pathExists)
-				fmt.Printf("Using unique name: %s\n", sanitizedName)
+				fmt.Printf("%s %s\n", successText("Using unique name:"), sanitizedName)
 				break
 			} else {
-				fmt.Println("Aborted by user.")
+				fmt.Println(warningText("Aborted by user."))
 				os.Exit(0)
 			}
 		} else {
@@ -273,19 +274,18 @@ func main() {
 	}
 
 	// 7. Show Summary & Confirm Generation
-	fmt.Println("\n--- Project Summary ---")
-	fmt.Printf("Project Name:    %s\n", sanitizedName)
-	fmt.Printf("Discipline:      %s\n", disciplineChoice.String())
+	fmt.Println("\n" + accentText("Project Summary"))
+	fmt.Printf("%s    %s\n", mutedText("Project Name:"), primaryText(sanitizedName))
+	fmt.Printf("%s      %s\n", mutedText("Discipline:"), primaryText(disciplineChoice.String()))
 	if isClient {
-		fmt.Println("Client Project:  Yes")
+		fmt.Printf("%s  %s\n", mutedText("Client Project:"), successText("Yes"))
 	} else {
-		fmt.Println("Client Project:  No")
+		fmt.Printf("%s  %s\n", mutedText("Client Project:"), primaryText("No"))
 	}
-	fmt.Printf("Target Path:     %s\n", targetPath)
-	fmt.Println("-----------------------")
+	fmt.Printf("%s     %s\n", mutedText("Target Path:"), primaryText(targetPath))
 
 	for {
-		fmt.Print("Create project? (y/n): ")
+		fmt.Print(promptText("Create project?") + mutedText(" (y/n): "))
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Printf("Error reading input: %v\n", err)
@@ -295,27 +295,27 @@ func main() {
 		if ok && isYes {
 			break
 		} else if ok {
-			fmt.Println("Cancelled project creation.")
+			fmt.Println(warningText("Cancelled project creation."))
 			os.Exit(0)
 		}
-		fmt.Println("Invalid input. Please enter 'y' or 'n'.")
+		fmt.Println(errorText("Invalid input. Please enter 'y' or 'n'."))
 	}
 
 	// 8. Generate Folder Structure
-	fmt.Printf("\nScaffolding folders in %s...\n", targetPath)
+	fmt.Printf("\n%s %s...\n", accentText("Scaffolding folders in"), primaryText(targetPath))
 	err = CreateFolderStructure(targetPath, disciplineChoice, isClient)
 	if err != nil {
 		fmt.Printf("Error during folder generation: %v\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Println("Folders successfully created.")
+	fmt.Println(successText("Folders successfully created."))
 
 	// 9. Post-creation actions
-	fmt.Println("\n[1] Open project in file manager")
-	fmt.Println("[2] Exit")
+	fmt.Println("\n" + promptText("[1]") + " " + primaryText("Open project in file manager"))
+	fmt.Println(promptText("[2]") + " " + primaryText("Exit"))
 	for {
-		fmt.Print("Selection (1-2): ")
+		fmt.Print(promptText("Selection") + mutedText(" (1-2): "))
 		choiceStr, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Printf("Error reading input: %v\n", err)
@@ -324,19 +324,19 @@ func main() {
 		choice, ok := ParseMenuChoice(choiceStr, 1, 2)
 		if ok {
 			if choice == 1 {
-				fmt.Printf("Opening folder: %s\n", targetPath)
+				fmt.Printf("%s %s\n", accentText("Opening folder:"), targetPath)
 				if err := OpenFolder(targetPath); err != nil {
 					fmt.Printf("Failed to open folder: %v\n", err)
 				}
-				fmt.Println("\nPress Enter to exit...")
+				fmt.Println("\n" + mutedText("Press Enter to exit..."))
 				_, _ = reader.ReadString('\n')
 			}
 			break
 		}
-		fmt.Println("Invalid selection. Please enter 1 or 2.")
+		fmt.Println(errorText("Invalid selection. Please enter 1 or 2."))
 	}
 
-	fmt.Println("Exiting Project Builder. Goodbye!")
+	fmt.Println(mutedText("Exiting Project Builder. Goodbye!"))
 }
 
 // sanitizeProjectName cleans up a user's input name to be safe across filesystems.
