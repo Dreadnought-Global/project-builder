@@ -76,37 +76,6 @@ func gradientLine(text string, stops []RGB, row, rows int, opts RenderOptions) s
 	return colorize(text, interpolateStops(stops, ratio), opts)
 }
 
-func gradientText(text string, stops []RGB, opts RenderOptions) string {
-	if !opts.UseColor || len(stops) == 0 {
-		return text
-	}
-	visible := []rune(text)
-	count := 0
-	for _, r := range visible {
-		if r != ' ' {
-			count++
-		}
-	}
-	if count == 0 {
-		return text
-	}
-	var b strings.Builder
-	idx := 0
-	for _, r := range visible {
-		if r == ' ' {
-			b.WriteRune(r)
-			continue
-		}
-		ratio := 0.0
-		if count > 1 {
-			ratio = float64(idx) / float64(count-1)
-		}
-		b.WriteString(colorize(string(r), interpolateStops(stops, ratio), opts))
-		idx++
-	}
-	return b.String()
-}
-
 func interpolateStops(stops []RGB, ratio float64) RGB {
 	if len(stops) == 1 {
 		return stops[0]

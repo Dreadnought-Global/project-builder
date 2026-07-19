@@ -16,12 +16,30 @@ func TestBannerNoColorHasNoANSI(t *testing.T) {
 	}
 }
 
-func TestBannerNarrowKeepsAnsiHeading(t *testing.T) {
+func TestBannerUsesFullAnsiHeadingWhenWide(t *testing.T) {
+	theme, _ := GetTheme("violet")
+	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 140})
+	lines := strings.Split(out, "\n")
+	if lines[0] != fullProjectBuilderBanner[0] {
+		t.Fatalf("expected full banner heading, got %q", lines[0])
+	}
+}
+
+func TestBannerUsesMediumHeadingWhenNormalWidth(t *testing.T) {
+	theme, _ := GetTheme("violet")
+	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 80})
+	lines := strings.Split(out, "\n")
+	if lines[0] != mediumProjectBuilderBanner[0] {
+		t.Fatalf("expected medium banner heading, got %q", lines[0])
+	}
+}
+
+func TestBannerUsesCompactHeadingWhenVeryNarrow(t *testing.T) {
 	theme, _ := GetTheme("violet")
 	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 40})
 	lines := strings.Split(out, "\n")
-	if lines[0] != projectBuilderBanner[0] {
-		t.Fatalf("expected full banner heading, got %q", lines[0])
+	if lines[0] != compactProjectBuilderBanner[0] {
+		t.Fatalf("expected compact banner heading, got %q", lines[0])
 	}
 }
 

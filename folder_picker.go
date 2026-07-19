@@ -53,14 +53,15 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
 			}
 		}
 
-		if linuxPickerCommand == "zenity" {
+		switch linuxPickerCommand {
+		case "zenity":
 			cmd := exec.Command("zenity", "--file-selection", "--directory", "--title=Select a folder")
 			out, err := cmd.Output()
 			if err != nil {
 				return "", nil
 			}
 			return strings.TrimSpace(string(out)), nil
-		} else if linuxPickerCommand == "kdialog" {
+		case "kdialog":
 			cmd := exec.Command("kdialog", "--getexistingdirectory", ".", "--title", "Select a folder")
 			out, err := cmd.Output()
 			if err != nil {
@@ -68,7 +69,7 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
 			}
 			return strings.TrimSpace(string(out)), nil
 		}
-		
+
 		return "", fmt.Errorf("no gui folder picker found")
 
 	default:

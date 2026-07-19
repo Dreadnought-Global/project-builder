@@ -128,9 +128,10 @@ func main() {
 			fmt.Println(errorText("Invalid selection. Please enter 1, 2, or 3."))
 		}
 
-		if folderChoice == 1 {
+		switch folderChoice {
+		case 1:
 			disciplineRoot = cfg.DefaultWorkbench
-		} else if folderChoice == 2 {
+		case 2:
 			fmt.Println(accentText("Opening native folder picker..."))
 			path, err := RunNativeFolderPicker()
 			if err != nil {
@@ -146,7 +147,7 @@ func main() {
 				os.Exit(0)
 			}
 			disciplineRoot = path
-		} else if folderChoice == 3 {
+		case 3:
 			path, err := RunFolderBrowser()
 			if err != nil {
 				fmt.Printf("Error running folder browser: %v\n", err)
