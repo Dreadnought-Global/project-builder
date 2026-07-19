@@ -11,44 +11,41 @@ func TestBannerNoColorHasNoANSI(t *testing.T) {
 	if strings.Contains(out, "\x1b[") || strings.Contains(out, "\x1b]") {
 		t.Fatalf("expected no ANSI in no-color output: %q", out)
 	}
-	if !strings.Contains(out, "Project Builder v2.0.0  |  Project Scaffolding & Workspace Automation Tool  |  2026-07-15  |  dreadnought.studio") {
-		t.Fatalf("metadata line missing: %q", out)
+	for _, want := range []string{"Project Builder v2.0.0", appDescription, "Release: 2026-07-15", "Creator: dreadnought.studio", "Repo:    github.com/fromrha/project-builder"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("expected %q in banner: %q", want, out)
+		}
 	}
 }
 
-func TestBannerUsesFullAnsiHeadingWhenWide(t *testing.T) {
+func TestBannerUsesPBMark(t *testing.T) {
 	theme, _ := GetTheme("violet")
 	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 140, Height: 40})
 	lines := strings.Split(out, "\n")
-	if lines[0] != fullProjectBuilderBanner[0] {
-		t.Fatalf("expected full banner heading, got %q", lines[0])
+	if lines[0] != pbBanner[0]+"  Project Builder v2.0.0" {
+		t.Fatalf("expected PB banner with title, got %q", lines[0])
 	}
 }
 
-func TestBannerUsesMediumHeadingWhenNormalWidth(t *testing.T) {
+func TestBannerStacksWhenNarrow(t *testing.T) {
 	theme, _ := GetTheme("violet")
-	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 80, Height: 40})
+	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 50, Height: 40})
 	lines := strings.Split(out, "\n")
-	if lines[0] != mediumProjectBuilderBanner[0] {
-		t.Fatalf("expected medium banner heading, got %q", lines[0])
+	if lines[0] != pbBanner[0] {
+		t.Fatalf("expected stacked PB icon first, got %q", lines[0])
+	}
+	if lines[len(pbBanner)] != "Project Builder v2.0.0" {
+		t.Fatalf("expected title below PB icon, got %q", lines[len(pbBanner)])
 	}
 }
 
-func TestBannerUsesCompactHeadingWhenVeryNarrow(t *testing.T) {
+func TestBannerColorIncludesHyperlinks(t *testing.T) {
 	theme, _ := GetTheme("violet")
-	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 40, Height: 40})
-	lines := strings.Split(out, "\n")
-	if lines[0] != compactProjectBuilderBanner[0] {
-		t.Fatalf("expected compact banner heading, got %q", lines[0])
-	}
-}
-
-func TestBannerUsesCompactHeadingWhenVeryShort(t *testing.T) {
-	theme, _ := GetTheme("violet")
-	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 140, Height: 8})
-	lines := strings.Split(out, "\n")
-	if lines[0] != compactProjectBuilderBanner[0] {
-		t.Fatalf("expected compact banner heading, got %q", lines[0])
+	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: true, Width: 140, Height: 40})
+	for _, want := range []string{studioURL, repoURL, "\x1b["} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("expected %q in color banner: %q", want, out)
+		}
 	}
 }
 

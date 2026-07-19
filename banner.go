@@ -2,56 +2,76 @@ package main
 
 import "strings"
 
-var fullProjectBuilderBanner = []string{
-	"██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗    ██████╗ ██╗   ██╗██╗██╗     ██████╗ ███████╗██████╗ ",
-	"██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝    ██╔══██╗██║   ██║██║██║     ██╔══██╗██╔════╝██╔══██╗",
-	"██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║       ██████╔╝██║   ██║██║██║     ██║  ██║█████╗  ██████╔╝",
-	"██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║       ██╔══██╗██║   ██║██║██║     ██║  ██║██╔══╝  ██╔══██╗",
-	"██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║       ██████╔╝╚██████╔╝██║███████╗██████╔╝███████╗██║  ██║",
-	"╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝       ╚═════╝  ╚═════╝ ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝  ╚═╝",
+var pbBanner = []string{
+	"██████╗ ██████╗ ",
+	"██╔══██╗██╔══██╗",
+	"██████╔╝██████╔╝",
+	"██╔═══╝ ██╔══██╗",
+	"██║     ██████╔╝",
+	"╚═╝     ╚═════╝ ",
 }
-
-var mediumProjectBuilderBanner = []string{
-	"█▀█ █▀█ █▀█ ░█ █▀▀ █▀▀ ▀█▀   █▀▄ █ █ █ █ █   █▀▄ █▀▀ █▀█",
-	"█▀▀ █▀▄ █▄█ ░█ █▀▀ █   ░█░   █▀▄ █ █ █ █ █   █▄▀ █▀▀ █▀▄",
-	"▀░░ ▀░▀ ▀░▀ █▄ █▄▄ █▄▄ ░▀░   ▀▀░ ▀▀▀ ▀ ▀ ▀▀▀ ▀▀░ ▀▀▀ ▀░▀",
-}
-
-var compactProjectBuilderBanner = []string{"PROJECT BUILDER"}
 
 func RenderStartupBanner(theme Theme, metadata ReleaseMetadata, opts RenderOptions) string {
-	banner := bannerForSize(opts)
-	var b strings.Builder
+	if opts.Width >= 72 {
+		return renderSideBySideBanner(theme, metadata, opts)
+	}
+	return renderStackedBanner(theme, metadata, opts)
+}
 
-	for i, line := range banner {
-		b.WriteString(gradientLine(line, theme.BannerGradientStops, i, len(banner), opts))
+func renderSideBySideBanner(theme Theme, metadata ReleaseMetadata, opts RenderOptions) string {
+	info := bannerInfoLines(theme, metadata, opts)
+	var b strings.Builder
+	for i, iconLine := range pbBanner {
+		b.WriteString(gradientLine(iconLine, theme.BannerGradientStops, i, len(pbBanner), opts))
+		b.WriteString("  ")
+		if i < len(info) {
+			b.WriteString(info[i])
+		}
 		b.WriteString("\n")
 	}
-	b.WriteString(colorize(FormatMetadataLine(metadata, opts), theme.Muted, opts))
-	b.WriteString("\n\n")
+	b.WriteString("\n")
 	return b.String()
 }
 
-func bannerForSize(opts RenderOptions) []string {
-	width := opts.Width
-	if opts.Height > 0 && opts.Height < 12 {
-		return compactProjectBuilderBanner
+func renderStackedBanner(theme Theme, metadata ReleaseMetadata, opts RenderOptions) string {
+	var b strings.Builder
+	for i, iconLine := range pbBanner {
+		b.WriteString(gradientLine(iconLine, theme.BannerGradientStops, i, len(pbBanner), opts))
+		b.WriteString("\n")
 	}
-	if width <= 0 || width >= bannerWidth(fullProjectBuilderBanner) {
-		return fullProjectBuilderBanner
+	for _, line := range bannerInfoLines(theme, metadata, opts) {
+		b.WriteString(line)
+		b.WriteString("\n")
 	}
-	if width >= bannerWidth(mediumProjectBuilderBanner) {
-		return mediumProjectBuilderBanner
-	}
-	return compactProjectBuilderBanner
+	b.WriteString("\n")
+	return b.String()
 }
 
-func bannerWidth(lines []string) int {
-	width := 0
-	for _, line := range lines {
-		if lineWidth := visibleLen(line); lineWidth > width {
-			width = lineWidth
-		}
+func bannerInfoLines(theme Theme, metadata ReleaseMetadata, opts RenderOptions) []string {
+	return []string{
+		colorize("Project Builder "+metadata.DisplayVersion(), theme.Primary, opts),
+		colorize(appDescription, theme.Muted, opts),
+		"",
+		bannerInfoLine("Release", metadata.ReleaseDate, theme, opts),
+		bannerInfoLine("Creator", linkIfColor(studioLabel, studioURL, opts), theme, opts),
+		bannerInfoLine("Repo", linkIfColor(repoLabel, repoURL, opts), theme, opts),
 	}
-	return width
+}
+
+func bannerInfoLine(label, value string, theme Theme, opts RenderOptions) string {
+	return colorize(padRight(label+":", 9), theme.Accent, opts) + colorize(value, theme.Primary, opts)
+}
+
+func linkIfColor(label, url string, opts RenderOptions) string {
+	if !opts.UseColor {
+		return label
+	}
+	return hyperlink(label, url)
+}
+
+func padRight(text string, width int) string {
+	for visibleLen(text) < width {
+		text += " "
+	}
+	return text
 }
