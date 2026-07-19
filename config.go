@@ -17,6 +17,7 @@ var configFilePathOverride string
 type Config struct {
 	DefaultWorkbench string            `yaml:"default_workbench"`
 	DisciplinePaths  map[string]string `yaml:"discipline_paths"`
+	Theme            string            `yaml:"theme"`
 }
 
 func (c *Config) GetDisciplinePath(d Discipline) string {
@@ -112,6 +113,7 @@ func LoadConfig() (Config, error) {
 	for key, value := range cfg.DisciplinePaths {
 		cfg.DisciplinePaths[key] = strings.TrimSpace(value)
 	}
+	cfg.Theme = normalizeThemeName(cfg.Theme)
 
 	return cfg, nil
 }
@@ -128,6 +130,7 @@ func SaveConfig(cfg Config) error {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
+	cfg.Theme = normalizeThemeName(cfg.Theme)
 	data, err := yaml.Marshal(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to marshal yaml: %w", err)

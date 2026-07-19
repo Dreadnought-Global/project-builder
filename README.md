@@ -47,12 +47,36 @@ Run the compiled executable to start the interactive initialization flow:
 ./project-builder
 ```
 
+### Startup Interface
+
+Project Builder starts with a large ANSI `PROJECT BUILDER` banner, release metadata from `CHANGELOG.md`, and a studio label. In terminals that support hyperlinks, `dreadnought.studio` opens `https://www.instagram.com/dreadnought.sc/` until the studio site is live.
+
+Use `--no-color` or `PROJECT_BUILDER_NO_COLOR=1` for monochrome output:
+
+```bash
+./project-builder --no-color
+```
+
 ### Command Line Flags
 
 To reset and reconfigure the global default workbench path, pass the reconfigure flag:
 
 ```bash
 ./project-builder --reconfigure
+```
+
+### Themes
+
+Theme selection is persisted in the same `config.yaml` file as workbench paths.
+
+```bash
+./project-builder theme list
+./project-builder theme set violet
+./project-builder theme set cyan
+./project-builder theme set emerald
+./project-builder theme set amber
+./project-builder theme set mono
+./project-builder theme reset
 ```
 
 ## Building from Source

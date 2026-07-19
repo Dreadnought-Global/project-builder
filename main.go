@@ -8,19 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Println("========================================")
-	fmt.Println("    Project Builder - Dreadnought Studio")
-	fmt.Println("========================================")
-	fmt.Println()
-
-	// Parse --reconfigure flag
-	reconfigure := false
-	for _, arg := range os.Args[1:] {
-		if arg == "--reconfigure" || arg == "-r" {
-			reconfigure = true
-			break
-		}
-	}
+	opts, args := ParseGlobalOptions(os.Args[1:])
 
 	// Load configuration
 	cfg, err := LoadConfig()
@@ -29,9 +17,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	if handled, _, code := HandleCommand(args, cfg, os.Stdin, os.Stdout); handled {
+		os.Exit(code)
+	}
+
+	renderOpts := DetectRenderOptions(opts.NoColor)
+	fmt.Print(RenderStartupBanner(ActiveTheme(cfg), CurrentReleaseMetadata(), renderOpts))
+
 	// 1. Global Default Workbench setup
-	if cfg.DefaultWorkbench == "" || reconfigure {
-		if reconfigure {
+	if cfg.DefaultWorkbench == "" || opts.Reconfigure {
+		if opts.Reconfigure {
 			fmt.Println("Reconfiguring global default workbench path...")
 		} else {
 			fmt.Println("First-run setup: Global default workbench path not configured.")
