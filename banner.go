@@ -20,7 +20,7 @@ var mediumProjectBuilderBanner = []string{
 var compactProjectBuilderBanner = []string{"PROJECT BUILDER"}
 
 func RenderStartupBanner(theme Theme, metadata ReleaseMetadata, opts RenderOptions) string {
-	banner := bannerForWidth(opts.Width)
+	banner := bannerForSize(opts)
 	var b strings.Builder
 
 	for i, line := range banner {
@@ -32,7 +32,11 @@ func RenderStartupBanner(theme Theme, metadata ReleaseMetadata, opts RenderOptio
 	return b.String()
 }
 
-func bannerForWidth(width int) []string {
+func bannerForSize(opts RenderOptions) []string {
+	width := opts.Width
+	if opts.Height > 0 && opts.Height < 12 {
+		return compactProjectBuilderBanner
+	}
 	if width <= 0 || width >= bannerWidth(fullProjectBuilderBanner) {
 		return fullProjectBuilderBanner
 	}

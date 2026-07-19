@@ -18,7 +18,7 @@ func TestBannerNoColorHasNoANSI(t *testing.T) {
 
 func TestBannerUsesFullAnsiHeadingWhenWide(t *testing.T) {
 	theme, _ := GetTheme("violet")
-	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 140})
+	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 140, Height: 40})
 	lines := strings.Split(out, "\n")
 	if lines[0] != fullProjectBuilderBanner[0] {
 		t.Fatalf("expected full banner heading, got %q", lines[0])
@@ -27,7 +27,7 @@ func TestBannerUsesFullAnsiHeadingWhenWide(t *testing.T) {
 
 func TestBannerUsesMediumHeadingWhenNormalWidth(t *testing.T) {
 	theme, _ := GetTheme("violet")
-	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 80})
+	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 80, Height: 40})
 	lines := strings.Split(out, "\n")
 	if lines[0] != mediumProjectBuilderBanner[0] {
 		t.Fatalf("expected medium banner heading, got %q", lines[0])
@@ -36,7 +36,16 @@ func TestBannerUsesMediumHeadingWhenNormalWidth(t *testing.T) {
 
 func TestBannerUsesCompactHeadingWhenVeryNarrow(t *testing.T) {
 	theme, _ := GetTheme("violet")
-	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 40})
+	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 40, Height: 40})
+	lines := strings.Split(out, "\n")
+	if lines[0] != compactProjectBuilderBanner[0] {
+		t.Fatalf("expected compact banner heading, got %q", lines[0])
+	}
+}
+
+func TestBannerUsesCompactHeadingWhenVeryShort(t *testing.T) {
+	theme, _ := GetTheme("violet")
+	out := RenderStartupBanner(theme, ReleaseMetadata{Version: "2.0.0", ReleaseDate: "2026-07-15"}, RenderOptions{UseColor: false, Width: 140, Height: 8})
 	lines := strings.Split(out, "\n")
 	if lines[0] != compactProjectBuilderBanner[0] {
 		t.Fatalf("expected compact banner heading, got %q", lines[0])

@@ -15,6 +15,7 @@ var ansiRegexp = regexp.MustCompile(`\x1b\[[0-9;]*[A-Za-z]|\x1b\]8;;.*?\x07|\x1b
 type RenderOptions struct {
 	UseColor bool
 	Width    int
+	Height   int
 }
 
 var activeRenderOptions = RenderOptions{UseColor: false, Width: 140}
@@ -27,13 +28,16 @@ func SetActiveStyle(theme Theme, opts RenderOptions) {
 
 func DetectRenderOptions(noColor bool) RenderOptions {
 	useColor := !noColor && os.Getenv("NO_COLOR") == "" && os.Getenv("PROJECT_BUILDER_NO_COLOR") == ""
-	width := 140
-	if columns := strings.TrimSpace(os.Getenv("COLUMNS")); columns != "" {
+	width, height := 140, 40
+	if terminalWidth, terminalHeight, ok := detectTerminalSize(os.Stdout.Fd()); ok {
+		width = terminalWidth
+		height = terminalHeight
+	} else if columns := strings.TrimSpace(os.Getenv("COLUMNS")); columns != "" {
 		if parsed, err := strconv.Atoi(columns); err == nil && parsed > 0 {
 			width = parsed
 		}
 	}
-	return RenderOptions{UseColor: useColor, Width: width}
+	return RenderOptions{UseColor: useColor, Width: width, Height: height}
 }
 
 func colorize(text string, color RGB, opts RenderOptions) string {
