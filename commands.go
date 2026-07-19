@@ -32,12 +32,16 @@ func HandleCommand(args []string, cfg Config, in io.Reader, out io.Writer) (bool
 	if len(args) == 0 {
 		return false, cfg, 0
 	}
-	if args[0] != "theme" {
+	switch args[0] {
+	case "install":
+		return true, cfg, handleInstallCommand(args[1:], out)
+	case "theme":
+		cfg, code := handleThemeCommand(args[1:], cfg, in, out)
+		return true, cfg, code
+	default:
 		fmt.Fprintf(out, "Unknown command: %s\n", args[0])
 		return true, cfg, 1
 	}
-	cfg, code := handleThemeCommand(args[1:], cfg, in, out)
-	return true, cfg, code
 }
 
 func handleThemeCommand(args []string, cfg Config, in io.Reader, out io.Writer) (Config, int) {

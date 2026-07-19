@@ -14,8 +14,8 @@ const (
 	appDescription = "Project Scaffolding & Workspace Automation Tool"
 	studioLabel    = "dreadnought.studio"
 	studioURL      = "https://www.instagram.com/dreadnought.sc/"
-	repoLabel      = "github.com/fromrha/project-builder"
-	repoURL        = "https://github.com/fromrha/project-builder"
+	repoLabel      = "github.com/Dreadnought-Global/project-builder"
+	repoURL        = "https://github.com/Dreadnought-Global/project-builder"
 )
 
 type ReleaseMetadata struct {

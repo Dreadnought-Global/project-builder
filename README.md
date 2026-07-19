@@ -19,11 +19,33 @@ Upon the first run, the tool launches an interactive, terminal-based folder brow
 Pre-built binaries for Windows, macOS, and Linux are available on the GitHub Releases page.
 
 1. Download the executable appropriate for your operating system.
-2. Place the binary in your system path or execute it directly.
+2. Run the self-install command from the download location:
 
-### Linux Installation & Desktop Launcher
+```bash
+./project-builder install
+```
 
-Running the binary directly from a terminal (`./project-builder`) is the standard, fully-supported way to run the tool on Linux.
+On Windows, run:
+
+```powershell
+.\project-builder.exe install
+```
+
+The installer copies Project Builder into a per-user bin directory and adds that directory to PATH. If the per-user PATH update is blocked by permissions, it asks before requesting administrator access. Open a new terminal after install, then run:
+
+```bash
+project-builder
+```
+
+Useful installer checks:
+
+```bash
+./project-builder install --dry-run
+./project-builder install status
+./project-builder install --force
+```
+
+Running the binary directly from a terminal (`./project-builder`) is still supported on Linux.
 
 For double-click launching via a file manager, a `project-builder.desktop` file is provided in the release. To install:
 1. Copy `project-builder.desktop` to `~/.local/share/applications/`.
@@ -49,12 +71,12 @@ Run the compiled executable to start the interactive initialization flow:
 
 ### Startup Interface
 
-Project Builder starts with a large ANSI `PROJECT BUILDER` banner, release metadata from `CHANGELOG.md`, and a studio label. In terminals that support hyperlinks, `dreadnought.studio` opens `https://www.instagram.com/dreadnought.sc/` until the studio site is live.
+Project Builder starts with a compact gradient `PB` banner, release metadata from `CHANGELOG.md`, creator link, and repository link. In terminals that support hyperlinks, `dreadnought.studio` opens `https://www.instagram.com/dreadnought.sc/` until the studio site is live.
 
 Use `--no-color` or `PROJECT_BUILDER_NO_COLOR=1` for monochrome output:
 
 ```bash
-./project-builder --no-color
+project-builder --no-color
 ```
 
 ### Command Line Flags
@@ -62,7 +84,7 @@ Use `--no-color` or `PROJECT_BUILDER_NO_COLOR=1` for monochrome output:
 To reset and reconfigure the global default workbench path, pass the reconfigure flag:
 
 ```bash
-./project-builder --reconfigure
+project-builder --reconfigure
 ```
 
 ### Themes
@@ -70,13 +92,13 @@ To reset and reconfigure the global default workbench path, pass the reconfigure
 Theme selection is persisted in the same `config.yaml` file as workbench paths.
 
 ```bash
-./project-builder theme list
-./project-builder theme set violet
-./project-builder theme set cyan
-./project-builder theme set emerald
-./project-builder theme set amber
-./project-builder theme set mono
-./project-builder theme reset
+project-builder theme list
+project-builder theme set violet
+project-builder theme set cyan
+project-builder theme set emerald
+project-builder theme set amber
+project-builder theme set mono
+project-builder theme reset
 ```
 
 ## Building from Source

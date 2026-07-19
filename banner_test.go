@@ -11,7 +11,7 @@ func TestBannerNoColorHasNoANSI(t *testing.T) {
 	if strings.Contains(out, "\x1b[") || strings.Contains(out, "\x1b]") {
 		t.Fatalf("expected no ANSI in no-color output: %q", out)
 	}
-	for _, want := range []string{"Project Builder v2.0.0", appDescription, "Release: 2026-07-15", "Creator: dreadnought.studio", "Repo:    github.com/fromrha/project-builder"} {
+	for _, want := range []string{"Project Builder v2.0.0", appDescription, "Release: 2026-07-15", "Creator: dreadnought.studio", "Repo:    github.com/Dreadnought-Global/project-builder"} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("expected %q in banner: %q", want, out)
 		}

@@ -5,6 +5,16 @@ All notable changes to Project Builder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as detailed in [AGENTS.md](AGENTS.md).
 
+## [2.1.0] - 2026-07-19
+
+### Added
+- Added `project-builder install` to copy the app into an OS-specific install directory and add it to PATH automatically.
+- Added installer options for `--dry-run`, `--force`, and `install status`.
+- Added administrator fallback when per-user install is blocked by permissions.
+
+### Fixed
+- Corrected the repository link shown in the startup banner to `https://github.com/Dreadnought-Global/project-builder`.
+
 ## [2.0.0] - 2026-07-15
 
 ### Added
