@@ -11,10 +11,11 @@ import (
 
 func TestAddPathBlockIsIdempotent(t *testing.T) {
 	path := filepath.Join(t.TempDir(), ".profile")
-	if err := addPathBlock(path, "$HOME/.local/bin"); err != nil {
+	block := posixPathBlock("$HOME/.local/bin")
+	if err := addPathBlock(path, "$HOME/.local/bin", block); err != nil {
 		t.Fatalf("addPathBlock failed: %v", err)
 	}
-	if err := addPathBlock(path, "$HOME/.local/bin"); err != nil {
+	if err := addPathBlock(path, "$HOME/.local/bin", block); err != nil {
 		t.Fatalf("second addPathBlock failed: %v", err)
 	}
 	data, err := os.ReadFile(path)
