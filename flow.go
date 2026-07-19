@@ -41,6 +41,16 @@ func ParseMenuChoice(input string, min int, max int) (int, bool) {
 	return choice, true
 }
 
+func ParseMenuChoiceWithDefault(input string, min int, max int, defaultChoice int) (int, bool) {
+	if strings.TrimSpace(input) == "" {
+		if defaultChoice < min || defaultChoice > max {
+			return 0, false
+		}
+		return defaultChoice, true
+	}
+	return ParseMenuChoice(input, min, max)
+}
+
 func ParseYesNo(input string) (bool, bool) {
 	switch strings.ToLower(strings.TrimSpace(input)) {
 	case "y", "yes":

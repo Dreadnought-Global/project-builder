@@ -5,6 +5,18 @@ All notable changes to Project Builder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as detailed in [AGENTS.md](AGENTS.md).
 
+## [2.2.0] - 2026-07-20
+
+### Added
+- Added a home dashboard on interactive launch with Create Project, Help, Settings, and Exit options.
+- Added a table-style help screen and `project-builder help` command.
+- Added settings screen entries for theme/profile selection, default workbench changes, config path, and PATH install guidance.
+
+### Changed
+- Interactive launch now clears the terminal before rendering the banner and dashboard for a clean focused start.
+- Blank Enter on the dashboard selects the default Create Project flow.
+- Cancelled folder selections and declined project creation now return to the previous menu/dashboard instead of immediately closing the app.
+
 ## [2.1.0] - 2026-07-19
 
 ### Added

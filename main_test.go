@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -260,5 +261,41 @@ func TestParseYesNo(t *testing.T) {
 func TestInvalidDisciplineReturnsError(t *testing.T) {
 	if _, err := GetFolderList(Discipline(99), false); err == nil {
 		t.Errorf("expected invalid discipline to return error")
+	}
+}
+
+func TestParseMenuChoiceWithDefault(t *testing.T) {
+	choice, ok := ParseMenuChoiceWithDefault("\n", 1, 4, 1)
+	if !ok || choice != 1 {
+		t.Fatalf("expected blank input to select default 1, got choice=%d ok=%t", choice, ok)
+	}
+
+	choice, ok = ParseMenuChoiceWithDefault("3\n", 1, 4, 1)
+	if !ok || choice != 3 {
+		t.Fatalf("expected explicit input to select 3, got choice=%d ok=%t", choice, ok)
+	}
+
+	if _, ok := ParseMenuChoiceWithDefault("\n", 1, 4, 9); ok {
+		t.Fatal("expected invalid default to fail")
+	}
+}
+
+func TestHelpAndSettingsRenderTables(t *testing.T) {
+	var help strings.Builder
+	renderHelp(&help)
+	helpText := stripANSI(help.String())
+	for _, want := range []string{"| command", "install status", "theme set <name>", "project-builder"} {
+		if !strings.Contains(helpText, want) {
+			t.Fatalf("expected help output to contain %q, got:\n%s", want, helpText)
+		}
+	}
+
+	var settings strings.Builder
+	renderSettings(&settings, Config{DefaultWorkbench: "/workbench", Theme: "cyan"})
+	settingsText := stripANSI(settings.String())
+	for _, want := range []string{"Active theme", "cyan", "Global workbench", "/workbench", "project-builder install"} {
+		if !strings.Contains(settingsText, want) {
+			t.Fatalf("expected settings output to contain %q, got:\n%s", want, settingsText)
+		}
 	}
 }

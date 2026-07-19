@@ -144,7 +144,7 @@ func (m folderBrowserModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m folderBrowserModel) View() string {
 	if m.quitted {
-		return "Setup cancelled. Exiting.\n"
+		return "Folder selection cancelled.\n"
 	}
 	if m.selected != "" {
 		return fmt.Sprintf("Selected: %s\n", m.selected)

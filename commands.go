@@ -33,6 +33,9 @@ func HandleCommand(args []string, cfg Config, in io.Reader, out io.Writer) (bool
 		return false, cfg, 0
 	}
 	switch args[0] {
+	case "help", "--help", "-h":
+		renderHelp(out)
+		return true, cfg, 0
 	case "install":
 		return true, cfg, handleInstallCommand(args[1:], out)
 	case "theme":
@@ -40,6 +43,7 @@ func HandleCommand(args []string, cfg Config, in io.Reader, out io.Writer) (bool
 		return true, cfg, code
 	default:
 		fmt.Fprintf(out, "Unknown command: %s\n", args[0])
+		fmt.Fprintln(out, "Run `project-builder help` for commands.")
 		return true, cfg, 1
 	}
 }

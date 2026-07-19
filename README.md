@@ -71,7 +71,26 @@ Run the compiled executable to start the interactive initialization flow:
 
 ### Startup Interface
 
-Project Builder starts with a compact gradient `PB` banner, release metadata from `CHANGELOG.md`, creator link, and repository link. In terminals that support hyperlinks, `dreadnought.studio` opens `https://www.instagram.com/dreadnought.sc/` until the studio site is live.
+Project Builder clears the terminal on launch, then renders the compact gradient `PB` banner, release metadata from `CHANGELOG.md`, creator link, repository link, and a dashboard menu at the top of the terminal. In terminals that support hyperlinks, `dreadnought.studio` opens `https://www.instagram.com/dreadnought.sc/` until the studio site is live.
+
+Dashboard options:
+
+```text
+[1] Create project folder (default)
+[2] Help
+[3] Settings
+[4] Exit
+```
+
+Press Enter on the dashboard to use the default `Create project folder` flow. Cancelled folder selections and declined project creation return to the previous menu or dashboard instead of immediately closing the app.
+
+The Help screen shows table-style usage and command references. It can also be opened directly:
+
+```bash
+project-builder help
+```
+
+The Settings screen currently exposes existing safe configuration actions: changing the theme/profile, changing the global default workbench, viewing the config file path, and install/PATH guidance.
 
 Use `--no-color` or `PROJECT_BUILDER_NO_COLOR=1` for monochrome output:
 
