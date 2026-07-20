@@ -21,7 +21,7 @@ func renderHomeDashboard(out io.Writer) {
 	fmt.Fprintln(out, promptText("[2]")+" "+primaryText("Help"))
 	fmt.Fprintln(out, promptText("[3]")+" "+primaryText("Settings"))
 	fmt.Fprintln(out, promptText("[4]")+" "+primaryText("Exit"))
-	fmt.Fprint(out, promptText("Selection")+mutedText(" (1-4, Enter=1): "))
+	fmt.Fprint(out, promptText("Selection")+mutedText(": "))
 }
 
 func renderHelp(out io.Writer) {
@@ -58,22 +58,27 @@ func renderSettings(out io.Writer, cfg Config) {
 	fmt.Fprintln(out, promptText("[1]")+" "+primaryText("Change theme / profile"))
 	fmt.Fprintln(out, promptText("[2]")+" "+primaryText("Change global default workbench"))
 	fmt.Fprintln(out, promptText("[3]")+" "+primaryText("Back"))
-	fmt.Fprint(out, promptText("Selection")+mutedText(" (1-3): "))
+	fmt.Fprint(out, promptText("Selection")+mutedText(": "))
 }
 
 func printMenuTable(out io.Writer, rows []menuRow) {
-	commandWidth := len("command")
+	commandWidth := 0
+	descWidth := 0
 	for _, row := range rows {
 		if len(row.Command) > commandWidth {
 			commandWidth = len(row.Command)
 		}
+		if len(row.Description) > descWidth {
+			descWidth = len(row.Description)
+		}
 	}
-	border := "+-" + strings.Repeat("-", commandWidth) + "-+-------------+"
+
+	border := "+-" + strings.Repeat("-", commandWidth) + "-+-" + strings.Repeat("-", descWidth) + "-+"
 	fmt.Fprintln(out, border)
-	fmt.Fprintf(out, "| %-*s | description |\n", commandWidth, "command")
+	fmt.Fprintf(out, "| %-*s | %-*s |\n", commandWidth, "command", descWidth, "description")
 	fmt.Fprintln(out, border)
 	for _, row := range rows {
-		fmt.Fprintf(out, "| %-*s | %s |\n", commandWidth, row.Command, row.Description)
+		fmt.Fprintf(out, "| %-*s | %-*s |\n", commandWidth, row.Command, descWidth, row.Description)
 	}
 	fmt.Fprintln(out, border)
 }

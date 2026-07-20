@@ -170,20 +170,24 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 	fmt.Fprintln(out, promptText("[2]")+" "+primaryText("Video & Motion"))
 	fmt.Fprintln(out, promptText("[3]")+" "+primaryText("Audio"))
 	fmt.Fprintln(out, promptText("[4]")+" "+primaryText("3D & Animation"))
+	fmt.Fprintln(out, promptText("[5]")+" "+primaryText("Back"))
 
 	var disciplineChoice Discipline
 	for {
-		fmt.Fprint(out, promptText("Selection")+mutedText(" (1-4): "))
+		fmt.Fprint(out, promptText("Selection")+mutedText(": "))
 		choiceStr, err := reader.ReadString('\n')
 		if err != nil {
 			return false, fmt.Errorf("reading discipline selection: %w", err)
 		}
-		choice, ok := ParseMenuChoice(choiceStr, 1, 4)
+		choice, ok := ParseMenuChoice(choiceStr, 1, 5)
 		if ok {
+			if choice == 5 {
+				return false, nil
+			}
 			disciplineChoice = Discipline(choice)
 			break
 		}
-		fmt.Fprintln(out, errorText("Invalid selection. Please enter a number between 1 and 4."))
+		fmt.Fprintln(out, errorText("Invalid selection. Please enter a number between 1 and 5."))
 	}
 
 	var disciplineRoot string
@@ -198,20 +202,21 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 			fmt.Fprintln(out, promptText("[1]")+" "+primaryText("Use Default Workbench")+mutedText(" ("+cfg.DefaultWorkbench+")"))
 			fmt.Fprintln(out, promptText("[2]")+" "+primaryText("Select folder")+mutedText(" (native picker)"))
 			fmt.Fprintln(out, promptText("[3]")+" "+primaryText("Select folder")+mutedText(" (terminal browser)"))
+			fmt.Fprintln(out, promptText("[4]")+" "+primaryText("Back"))
 
 			var folderChoice int
 			for {
-				fmt.Fprint(out, "Selection (1-3): ")
+				fmt.Fprint(out, promptText("Selection")+mutedText(": "))
 				choiceStr, err := reader.ReadString('\n')
 				if err != nil {
 					return false, fmt.Errorf("reading folder selection: %w", err)
 				}
-				choice, ok := ParseMenuChoice(choiceStr, 1, 3)
+				choice, ok := ParseMenuChoice(choiceStr, 1, 4)
 				if ok {
 					folderChoice = choice
 					break
 				}
-				fmt.Fprintln(out, errorText("Invalid selection. Please enter 1, 2, or 3."))
+				fmt.Fprintln(out, errorText("Invalid selection. Please enter a number between 1 and 4."))
 			}
 
 			switch folderChoice {
@@ -242,6 +247,8 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 					continue
 				}
 				disciplineRoot = path
+			case 4:
+				return false, nil
 			}
 		}
 
@@ -299,7 +306,7 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 
 			var collisionChoice int
 			for {
-				fmt.Fprint(out, promptText("Selection")+mutedText(" (1-3): "))
+				fmt.Fprint(out, promptText("Selection")+mutedText(": "))
 				choiceStr, err := reader.ReadString('\n')
 				if err != nil {
 					return false, fmt.Errorf("reading collision selection: %w", err)
@@ -388,7 +395,7 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 	fmt.Fprintln(out, "\n"+promptText("[1]")+" "+primaryText("Open project in file manager"))
 	fmt.Fprintln(out, promptText("[2]")+" "+primaryText("Exit"))
 	for {
-		fmt.Fprint(out, promptText("Selection")+mutedText(" (1-2): "))
+		fmt.Fprint(out, promptText("Selection")+mutedText(": "))
 		choiceStr, err := reader.ReadString('\n')
 		if err != nil {
 			return false, fmt.Errorf("reading post-creation selection: %w", err)
