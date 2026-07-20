@@ -1,8 +1,9 @@
+![Project Builder banner](Resources/Public/project-builder-banner.png)
+
 # Project Builder
 
 Project Builder is a cross-platform command line utility written in Go that scaffolds standardized project directory structures for creative disciplines.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Dreadnought-Global/project-builder&type=Date)](https://star-history.com/#Dreadnought-Global/project-builder&Date)
 
 ## Overview
 
@@ -175,6 +176,8 @@ go build -o project-builder .
 ```bash
 go test -v ./...
 ```
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Dreadnought-Global/project-builder&type=Date)](https://star-history.com/#Dreadnought-Global/project-builder&Date)
 
 ## License
 
