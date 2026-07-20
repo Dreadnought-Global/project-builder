@@ -1,4 +1,4 @@
-module github.com/fromrha/project-builder
+module github.com/Dreadnought-Global/project-builder
 
 go 1.26.5
 

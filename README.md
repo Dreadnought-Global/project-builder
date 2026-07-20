@@ -2,6 +2,8 @@
 
 Project Builder is a cross-platform command line utility written in Go that scaffolds standardized project directory structures for creative disciplines.
 
+[![Star History Chart](https://api.star-history.com/svg?repos=Dreadnought-Global/project-builder&type=Date)](https://star-history.com/#Dreadnought-Global/project-builder&Date)
+
 ## Overview
 
 The tool automates the creation of directory trees for four creative disciplines:
@@ -120,6 +122,33 @@ project-builder theme set mono
 project-builder theme reset
 ```
 
+## Common Problems & Troubleshooting
+
+### 1. `Unknown command: project-builder` after installation
+- **Cause**: The installation directory is not loaded in your current shell's PATH.
+- **Solution**: Restart your terminal session, or run `source ~/.bashrc` (or your shell equivalent) to reload the PATH configurations.
+
+### 2. Native Folder Picker fails on Linux
+- **Cause**: Missing graphical dialog libraries like `zenity` or `kdialog`.
+- **Solution**: The application will automatically fall back to the built-in terminal folder browser. You can also install the missing tool:
+  - Ubuntu/Debian: `sudo apt install zenity`
+  - Arch Linux: `sudo pacman -S zenity`
+
+### 3. Folder browser permission error
+- **Cause**: Running the app inside folders that require administrative permissions.
+- **Solution**: Ensure your default workbench is set within your user home directory (e.g. `~/Documents` or `~/Projects`).
+
+## Frequently Asked Questions (Q&A)
+
+**Q: Where are the default discipline paths stored?**
+A: Inside your OS-specific configuration file (`config.yaml`). You can view this location in the dashboard under settings.
+
+**Q: Can I run this tool in scripts?**
+A: Yes. You can bypass the interactive menu by executing direct subcommands (like `theme set cyan` or `install status`).
+
+**Q: How do I change the default workbench path?**
+A: Run `project-builder --reconfigure`, or launch the dashboard, go to Settings, and select "Change global default workbench".
+
 ## Building from Source
 
 ### Prerequisites
@@ -149,4 +178,4 @@ go test -v ./...
 
 ## License
 
-Proprietary. Copyright (c) Dreadnought Studio. All rights reserved.
+MIT License. Copyright (c) 2026 Dreadnought Studio. All rights reserved. See the [LICENSE](LICENSE) file for details.
