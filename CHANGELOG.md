@@ -5,6 +5,18 @@ All notable changes to Project Builder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as detailed in [AGENTS.md](AGENTS.md).
 
+## [2.3.0] - 2026-07-21
+
+### Added
+- Added confirmation before cancelling the terminal folder browser with `Ctrl+C` or `q`, helping prevent accidental loss of the current selection.
+- Added folder browser controls to the Help screen.
+
+### Changed
+- Redesigned terminal folder browser with a clean themed header, full-screen redraws, and compact folder selection view.
+- Shortened deep folder paths with `~` and `...` so narrow terminal windows stay readable.
+- Cleared terminal between major project-creation steps and now show the selected destination before later project questions.
+- Linux and macOS configuration now honor `XDG_CONFIG_HOME`, allowing isolated first-run testing without reading existing settings.
+
 ## [2.2.0] - 2026-07-20
 
 ### Added
