@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -29,7 +30,7 @@ type installPlan struct {
 
 var errInstallNeedsElevation = errors.New("install needs elevated access")
 
-func handleInstallCommand(args []string, out io.Writer) int {
+func handleInstallCommand(args []string, in io.Reader, out io.Writer) int {
 	opts, err := parseInstallOptions(args)
 	if err != nil {
 		fmt.Fprintf(out, "%v\n", err)
@@ -46,7 +47,42 @@ func handleInstallCommand(args []string, out io.Writer) int {
 		fmt.Fprintf(out, "Install failed: %v\n", err)
 		return 1
 	}
+	if opts.DryRun {
+		return 0
+	}
+	if err := acknowledgeFolderBrowserControls(in, out); err != nil {
+		fmt.Fprintf(out, "Could not save onboarding acknowledgement: %v\n", err)
+		return 1
+	}
 	return 0
+}
+
+func acknowledgeFolderBrowserControls(in io.Reader, out io.Writer) error {
+	cfg, err := LoadConfig()
+	if err != nil || cfg.FolderBrowserControlsAcknowledged {
+		return err
+	}
+
+	fmt.Fprintln(out, "\nFolder browser controls")
+	fmt.Fprintln(out, "  ↑/↓ or j/k   Move highlighted folder")
+	fmt.Fprintln(out, "  Enter        Open highlighted folder")
+	fmt.Fprintln(out, "  Backspace    Go to parent folder")
+	fmt.Fprintln(out, "  Space or s   Select highlighted folder")
+	fmt.Fprintln(out, "  q or Ctrl+C  Cancel selection; confirmation required")
+
+	reader := bufio.NewReader(in)
+	for {
+		fmt.Fprint(out, "\nUnderstood? (y): ")
+		answer, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("reading onboarding acknowledgement: %w", err)
+		}
+		if strings.EqualFold(strings.TrimSpace(answer), "y") || strings.EqualFold(strings.TrimSpace(answer), "yes") {
+			cfg.FolderBrowserControlsAcknowledged = true
+			return SaveConfig(cfg)
+		}
+		fmt.Fprintln(out, "Enter y after reviewing the controls.")
+	}
 }
 
 func parseInstallOptions(args []string) (installOptions, error) {

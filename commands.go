@@ -37,7 +37,11 @@ func HandleCommand(args []string, cfg Config, in io.Reader, out io.Writer) (bool
 		renderHelp(out)
 		return true, cfg, 0
 	case "install":
-		return true, cfg, handleInstallCommand(args[1:], out)
+		return true, cfg, handleInstallCommand(args[1:], in, out)
+	case "version", "--version", "-v":
+		metadata := CurrentReleaseMetadata()
+		fmt.Fprintf(out, "Project Builder %s (%s)\n", metadata.DisplayVersion(), metadata.ReleaseDate)
+		return true, cfg, 0
 	case "theme":
 		cfg, code := handleThemeCommand(args[1:], cfg, in, out)
 		return true, cfg, code

@@ -33,6 +33,7 @@ func renderHelp(out io.Writer) {
 	printMenuTable(out, []menuRow{
 		{"install", "Install Project Builder and add it to PATH"},
 		{"install status", "Show install and PATH status"},
+		{"version, --version", "Show installed release version"},
 		{"theme list", "List available themes / profiles"},
 		{"theme set <name>", "Set theme: violet, cyan, emerald, amber, mono"},
 		{"theme reset", "Reset theme to default"},

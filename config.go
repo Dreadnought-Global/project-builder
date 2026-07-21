@@ -15,9 +15,10 @@ var configFilePathOverride string
 
 // Config represents the application settings structure.
 type Config struct {
-	DefaultWorkbench string            `yaml:"default_workbench"`
-	DisciplinePaths  map[string]string `yaml:"discipline_paths"`
-	Theme            string            `yaml:"theme"`
+	DefaultWorkbench                  string            `yaml:"default_workbench"`
+	DisciplinePaths                   map[string]string `yaml:"discipline_paths"`
+	Theme                             string            `yaml:"theme"`
+	FolderBrowserControlsAcknowledged bool              `yaml:"folder_browser_controls_acknowledged"`
 }
 
 func (c *Config) GetDisciplinePath(d Discipline) string {

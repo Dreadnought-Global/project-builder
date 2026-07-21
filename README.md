@@ -34,10 +34,22 @@ On Windows, run:
 .\project-builder.exe install
 ```
 
-The installer copies Project Builder into a per-user bin directory and adds that directory to PATH. If the per-user PATH update is blocked by permissions, it asks before requesting administrator access. Open a new terminal after install, then run:
+The installer copies Project Builder into a per-user bin directory and adds that directory to PATH. On first successful install, it displays folder-browser controls and requires `y` acknowledgement once. If the per-user PATH update is blocked by permissions, it asks before requesting administrator access. Open a new terminal after install, then run:
 
 ```bash
 project-builder
+```
+
+Update an existing global installation with:
+
+```bash
+./project-builder install --force
+```
+
+Check installed release:
+
+```bash
+project-builder --version
 ```
 
 Useful installer checks:
@@ -45,7 +57,6 @@ Useful installer checks:
 ```bash
 ./project-builder install --dry-run
 ./project-builder install status
-./project-builder install --force
 ```
 
 Running the binary directly from a terminal (`./project-builder`) is still supported on Linux.

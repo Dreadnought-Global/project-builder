@@ -5,6 +5,15 @@ All notable changes to Project Builder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as detailed in [AGENTS.md](AGENTS.md).
 
+## [2.4.0] - 2026-07-21
+
+### Added
+- Added a one-time folder-browser controls guide after first successful installation. Users confirm with `y` before continuing.
+- Added `project-builder version` and `project-builder --version` to show installed release metadata.
+
+### Changed
+- `project-builder install --force` now clearly serves as the update command for an existing global installation.
+
 ## [2.3.0] - 2026-07-21
 
 ### Added
