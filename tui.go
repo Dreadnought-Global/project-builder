@@ -10,12 +10,14 @@ import (
 )
 
 type folderBrowserModel struct {
-	currentDir string
-	folders    []string
-	cursor     int
-	selected   string
-	quitted    bool
-	err        error
+	currentDir  string
+	folders     []string
+	cursor      int
+	selected    string
+	quitted     bool
+	err         error
+	width       int
+	confirmQuit bool
 }
 
 func initialModel() (folderBrowserModel, error) {
@@ -26,6 +28,7 @@ func initialModel() (folderBrowserModel, error) {
 
 	m := folderBrowserModel{
 		currentDir: home,
+		width:      activeRenderOptions.Width,
 	}
 	if err := m.updateFolders(); err != nil {
 		m.err = err
@@ -69,11 +72,28 @@ func (m folderBrowserModel) Init() tea.Cmd {
 
 func (m folderBrowserModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		return m, nil
+
 	case tea.KeyMsg:
+		if m.confirmQuit {
+			switch strings.ToLower(msg.String()) {
+			case "y", "yes":
+				m.quitted = true
+				return m, tea.Quit
+			case "n", "no", "esc":
+				m.confirmQuit = false
+				return m, nil
+			default:
+				return m, nil
+			}
+		}
+
 		switch msg.String() {
 		case "ctrl+c", "q":
-			m.quitted = true
-			return m, tea.Quit
+			m.confirmQuit = true
+			return m, nil
 
 		case "up", "k":
 			if len(m.folders) == 0 {
@@ -150,45 +170,56 @@ func (m folderBrowserModel) View() string {
 		return fmt.Sprintf("Selected: %s\n", m.selected)
 	}
 
-	var s strings.Builder
-	s.WriteString("==================================================\n")
-	s.WriteString("  Setup Workbench: Choose Your Root Project Folder \n")
-	s.WriteString("==================================================\n\n")
-	s.WriteString(fmt.Sprintf("Current Directory: [ %s ]\n", m.currentDir))
-
-	if m.err != nil {
-		s.WriteString(fmt.Sprintf("\n⚠️ Error: %v\n\n", m.err))
-	} else {
-		s.WriteString("\n")
+	width := m.width
+	if width <= 0 {
+		width = 80
+	}
+	contentWidth := width - 4
+	if contentWidth < 24 {
+		contentWidth = 24
 	}
 
-	s.WriteString("Folders:\n")
+	var s strings.Builder
+	s.WriteString("\033[H\033[2J")
+	s.WriteString("\n")
+	s.WriteString(accentText("Project Builder"))
+	s.WriteString(mutedText("  /  Choose project folder\n\n"))
+	s.WriteString(primaryText("Current directory\n"))
+	s.WriteString(mutedText(shortenPath(m.currentDir, contentWidth)))
+	s.WriteString("\n\n")
+
+	if m.err != nil {
+		s.WriteString(errorText(fmt.Sprintf("Cannot open folder: %v", m.err)))
+		s.WriteString("\n\n")
+	}
+
+	s.WriteString(primaryText("Folders\n"))
 	if len(m.folders) == 0 {
-		s.WriteString("  (No subfolders found)\n")
+		s.WriteString(mutedText("  No subfolders found\n"))
 	} else {
 		for i, folder := range m.folders {
 			cursor := " "
 			if m.cursor == i {
 				cursor = ">"
 			}
-			s.WriteString(fmt.Sprintf(" %s %s\n", cursor, folder))
+			s.WriteString(fmt.Sprintf(" %s %s\n", promptText(cursor), shortenPath(folder, contentWidth-3)))
 		}
 	}
-
-	s.WriteString("\n--------------------------------------------------\n")
-	s.WriteString("Controls:\n")
-	s.WriteString("  [↑/↓] or [j/k]  Move cursor\n")
-	s.WriteString("  [Enter]         Open highlighted folder\n")
-	s.WriteString("  [Backspace]     Go back to parent folder\n")
-	s.WriteString("  [Space] or [s]  Confirm and select highlighted folder\n")
-	s.WriteString("  [q]             Cancel & Quit\n")
-	s.WriteString("--------------------------------------------------\n")
 
 	target := m.currentDir
 	if len(m.folders) > 0 && m.folders[m.cursor] != ".." {
 		target = filepath.Join(m.currentDir, m.folders[m.cursor])
 	}
-	s.WriteString(fmt.Sprintf("\nTarget selection: %s\n", target))
+	s.WriteString("\n")
+	s.WriteString(mutedText("Target: "))
+	s.WriteString(primaryText(shortenPath(target, contentWidth-8)))
+	s.WriteString("\n")
+
+	if m.confirmQuit {
+		s.WriteString("\n")
+		s.WriteString(warningText("Cancel folder selection?"))
+		s.WriteString(mutedText(" [y] Yes  [n/Esc] Continue\n"))
+	}
 
 	return s.String()
 }

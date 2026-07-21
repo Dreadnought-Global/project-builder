@@ -40,6 +40,15 @@ func renderHelp(out io.Writer) {
 		{"--no-color", "Disable ANSI colors"},
 		{"help", "Show this help screen"},
 	})
+	fmt.Fprintln(out)
+	fmt.Fprintln(out, accentText("Folder browser:"))
+	printMenuTable(out, []menuRow{
+		{"↑/↓ or j/k", "Move highlighted folder"},
+		{"Enter", "Open highlighted folder"},
+		{"Backspace", "Go to parent folder"},
+		{"Space or s", "Select highlighted folder"},
+		{"q or Ctrl+C", "Cancel selection; confirmation required"},
+	})
 }
 
 func renderSettings(out io.Writer, cfg Config) {

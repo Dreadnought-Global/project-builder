@@ -15,7 +15,7 @@ The tool automates the creation of directory trees for four creative disciplines
 
 It provides a conditional client project overlay (`00_Client_Docs` at the root and `Client_Handoff` within the discipline's final export folders). Client projects are nested under a `00_Client_Projects` directory, while non-client projects are placed under `01_Passion_Projects`.
 
-Upon the first run, the tool launches an interactive, terminal-based folder browser to select a Global Default Workbench directory. During project creation, users can choose to save different default destinations on a per-discipline basis using an OS-native folder picker dialog or the terminal browser. These paths are stored in a configuration file (`config.yaml`) and used for subsequent project initializations.
+Upon first project creation, the tool launches an interactive, terminal-based folder browser to select a Global Default Workbench directory. During project creation, users can choose to save different default destinations on a per-discipline basis using an OS-native folder picker dialog or terminal browser. After selection, the chosen folder is shown before the next question. These paths are stored in `config.yaml` and used for subsequent project initializations.
 
 ## Installation
 
@@ -61,8 +61,8 @@ For double-click launching via a file manager, a `project-builder.desktop` file 
 ### Configuration Path
 
 The tool stores its configuration file at the following locations:
-- **Linux/macOS**: `~/.config/project-builder/config.yaml`
-- **Windows**: `%APPDATA%\project-builder\config.yaml`
+- **Linux/macOS**: `$XDG_CONFIG_HOME/project-builder/config.yaml` when `XDG_CONFIG_HOME` is set; otherwise `~/.config/project-builder/config.yaml`
+- **Windows**: `%APPDATA%\\project-builder\\config.yaml`
 
 ## Usage
 
@@ -74,7 +74,7 @@ Run the compiled executable to start the interactive initialization flow:
 
 ### Startup Interface
 
-Project Builder clears the terminal on launch, then renders the compact gradient `PB` banner, release metadata from `CHANGELOG.md`, creator link, repository link, and a dashboard menu at the top of the terminal. In terminals that support hyperlinks, `dreadnought.studio` opens `https://www.instagram.com/dreadnought.sc/` until the studio site is live.
+Project Builder clears the terminal on launch and before major steps, then renders the compact gradient `PB` banner, release metadata from `CHANGELOG.md`, creator link, repository link, and dashboard menu. In terminals that support hyperlinks, `dreadnought.studio` opens `https://www.instagram.com/dreadnought.sc/` until studio site is live.
 
 Dashboard options:
 
@@ -85,7 +85,19 @@ Dashboard options:
 [4] Exit
 ```
 
-Press Enter on the dashboard to use the default `Create project folder` flow. Cancelled folder selections and declined project creation return to the previous menu or dashboard instead of immediately closing the app.
+Press Enter on dashboard to use default `Create project folder` flow. Cancelled folder selections and declined project creation return to previous menu or dashboard instead of immediately closing app.
+
+### Folder Browser
+
+Folder browser redraws cleanly, shortens deep paths with `~` and `...`, and keeps controls in Help instead of on every screen:
+
+```text
+↑/↓ or j/k      Move highlighted folder
+Enter           Open highlighted folder
+Backspace       Go to parent folder
+Space or s      Select highlighted folder
+q or Ctrl+C     Request cancel; press y to confirm
+```
 
 The Help screen shows table-style usage and command references. It can also be opened directly:
 

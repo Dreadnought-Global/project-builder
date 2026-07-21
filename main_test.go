@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -297,5 +298,56 @@ func TestHelpAndSettingsRenderTables(t *testing.T) {
 		if !strings.Contains(settingsText, want) {
 			t.Fatalf("expected settings output to contain %q, got:\n%s", want, settingsText)
 		}
+	}
+}
+
+func TestFolderBrowserQuitConfirmation(t *testing.T) {
+	m := folderBrowserModel{}
+
+	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeyCtrlC})
+	m = updated.(folderBrowserModel)
+	if !m.confirmQuit || m.quitted {
+		t.Fatalf("first Ctrl+C should request confirmation, got confirmQuit=%t quitted=%t", m.confirmQuit, m.quitted)
+	}
+
+	updated, _ = m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'n'}})
+	m = updated.(folderBrowserModel)
+	if m.confirmQuit || m.quitted {
+		t.Fatalf("n should resume browser, got confirmQuit=%t quitted=%t", m.confirmQuit, m.quitted)
+	}
+
+	updated, _ = m.Update(tea.KeyMsg{Type: tea.KeyCtrlC})
+	m = updated.(folderBrowserModel)
+	updated, _ = m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'y'}})
+	m = updated.(folderBrowserModel)
+	if !m.quitted {
+		t.Fatal("y should confirm folder browser cancellation")
+	}
+}
+
+func TestShortenPath(t *testing.T) {
+	if got := shortenPath("/very/long/path/to/project", 15); got != "/very/...roject" {
+		t.Errorf("shortenPath() = %q", got)
+	}
+	if got := shortenPath("/very/long/path", 5); got != "..." {
+		t.Errorf("shortenPath() for narrow width = %q", got)
+	}
+}
+
+func TestConfigPathUsesXDGConfigHome(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("XDG_CONFIG_HOME is not used on Windows")
+	}
+	configFilePathOverride = ""
+	t.Cleanup(func() { configFilePathOverride = "" })
+	t.Setenv("XDG_CONFIG_HOME", "/tmp/project-builder-xdg")
+
+	got, err := GetConfigFilePath()
+	if err != nil {
+		t.Fatalf("GetConfigFilePath() error = %v", err)
+	}
+	want := filepath.Join("/tmp/project-builder-xdg", "project-builder", "config.yaml")
+	if got != want {
+		t.Errorf("GetConfigFilePath() = %q, want %q", got, want)
 	}
 }

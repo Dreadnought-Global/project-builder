@@ -64,11 +64,14 @@ func GetConfigFilePath() (string, error) {
 			baseDir = userConfig
 		}
 	} else {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return "", err
+		baseDir = os.Getenv("XDG_CONFIG_HOME")
+		if baseDir == "" {
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return "", err
+			}
+			baseDir = filepath.Join(home, ".config")
 		}
-		baseDir = filepath.Join(home, ".config")
 	}
 
 	return filepath.Join(baseDir, "project-builder", "config.yaml"), nil

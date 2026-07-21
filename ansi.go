@@ -69,6 +69,24 @@ func visibleLen(s string) int {
 	return utf8.RuneCountInString(stripANSI(s))
 }
 
+func shortenPath(path string, width int) string {
+	if path == "" {
+		return ""
+	}
+	home, err := os.UserHomeDir()
+	if err == nil && home != "" && strings.HasPrefix(path, home) {
+		path = "~" + strings.TrimPrefix(path, home)
+	}
+	if len(path) <= width {
+		return path
+	}
+	if width <= 5 {
+		return "..."
+	}
+	half := (width - 3) / 2
+	return path[:half] + "..." + path[len(path)-(width-3-half):]
+}
+
 func gradientLine(text string, stops []RGB, row, rows int, opts RenderOptions) string {
 	if !opts.UseColor || len(stops) == 0 {
 		return text

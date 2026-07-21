@@ -90,6 +90,7 @@ func ensureDefaultWorkbench(cfg *Config, reconfigure bool, reader *bufio.Reader,
 	} else {
 		fmt.Fprintln(out, accentText("First-run setup: Global default workbench path not configured."))
 	}
+	clearTerminal(out)
 	selectedPath, err := RunFolderBrowser()
 	if err != nil {
 		return false, fmt.Errorf("running folder browser: %w", err)
@@ -165,7 +166,8 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 		break
 	}
 
-	fmt.Fprintln(out, accentText("\nSelect discipline:"))
+	clearTerminal(out)
+	fmt.Fprintln(out, accentText("Select discipline:"))
 	fmt.Fprintln(out, promptText("[1]")+" "+primaryText("Design"))
 	fmt.Fprintln(out, promptText("[2]")+" "+primaryText("Video & Motion"))
 	fmt.Fprintln(out, promptText("[3]")+" "+primaryText("Audio"))
@@ -198,7 +200,8 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 		disciplineRoot = savedPath
 	} else {
 		for disciplineRoot == "" {
-			fmt.Fprintf(out, "\n%s\n", accentText("Where should this project be created?"))
+			clearTerminal(out)
+			fmt.Fprintln(out, accentText("Where should this project be created?"))
 			fmt.Fprintln(out, promptText("[1]")+" "+primaryText("Use Default Workbench")+mutedText(" ("+cfg.DefaultWorkbench+")"))
 			fmt.Fprintln(out, promptText("[2]")+" "+primaryText("Select folder")+mutedText(" (native picker)"))
 			fmt.Fprintln(out, promptText("[3]")+" "+primaryText("Select folder")+mutedText(" (terminal browser)"))
@@ -253,6 +256,8 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 		}
 
 		if !declined {
+			clearTerminal(out)
+			fmt.Fprintf(out, "%s\n%s %s\n", accentText("Project location selected"), mutedText("Folder:"), primaryText(disciplineRoot))
 			for {
 				fmt.Fprintf(out, "\n%s %s%s", promptText("Set this as the default workbench for"), primaryText(disciplineChoice.String()), mutedText("? (y/n): "))
 				input, err := reader.ReadString('\n')
@@ -357,7 +362,8 @@ func runCreateProjectFlow(cfg *Config, reader *bufio.Reader, out io.Writer) (boo
 		}
 	}
 
-	fmt.Fprintln(out, "\n"+accentText("Project Summary"))
+	clearTerminal(out)
+	fmt.Fprintln(out, accentText("Project Summary"))
 	fmt.Fprintf(out, "%s    %s\n", mutedText("Project Name:"), primaryText(sanitizedName))
 	fmt.Fprintf(out, "%s      %s\n", mutedText("Discipline:"), primaryText(disciplineChoice.String()))
 	if isClient {
